@@ -27,7 +27,7 @@ and their own report, as two separate submissions.
 ### Collaboration policy
 You are welcome to work with your classmates, and we encourage you to. Talk
 through the concepts, debug together, compare modeling choices, and help each
-other past sticking points — you will get more out of this problem set that way.
+other past sticking points. 
 
 What you hand in has to be your own. Write your own code and your own report,
 and note at the top of your submission who you worked with.
