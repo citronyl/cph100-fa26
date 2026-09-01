@@ -2,6 +2,7 @@
 # Designing lung cancer screening programs with machine learning
 #### CPH 100A Problem Set 1
 #### Due Date: 10:00 AM PT, Fri Sept 11, 2026
+#### Everyone is required to submit their own code and their own report.
 
 ## Introduction
 
@@ -9,22 +10,32 @@ Lung cancer screening with low-dose computed tomography significantly improves p
 
 ## Deliverables
 
-### Individual Submissions (each student):
+There are no teams in this problem set. Every student submits their own code
+and their own report, as two separate submissions.
+
+### Code submission (Part 1)
 - Complete implementation of `logistic_regression.py`, `vectorizer.py`, and `dispatcher.py`
 - Working `main.py` that prints the model AUC on the test set
 - Grid search results CSV file
-- **Due**: Individual code submissions by 10:00 AM PT, Fri Sept 11, 2026
 
-### Team Submissions (one per team, teams of 5):
-- Joint analysis report covering Parts 2.1-2.5
-- Performance analysis across subgroups
-- Clinical utility simulation results
-- **Due**: Team reports by 10:00 AM PT, Fri Sept 11, 2026
+### Report submission (Part 2)
+- A short report covering Parts 2.1-2.5, including your subgroup performance
+  analysis and clinical utility simulation results
+
+**Both due**: 10:00 AM PT, Fri Sept 11, 2026
+
+### Collaboration policy
+You are welcome to work with your classmates, and we encourage you to. Talk
+through the concepts, debug together, compare modeling choices, and help each
+other past sticking points — you will get more out of this problem set that way.
+
+What you hand in has to be your own. Write your own code and your own report,
+and note at the top of your submission who you worked with.
 
 
 ### Use of AI in this problem set
-- **Individual Implementation**: For your own learning, we encourage you NOT to use AI to solve the core model implementation (logistic regression, gradient computation, age vectorizer). Going through these manually will help you master gradient descent and SGD concepts. Discuss challenges with teammates and instructors at office hours.
-- **Encouraged AI Use**: You are explicitly encouraged to use AI tools for the full vectorizer, dispatcher  and team-based analyses. Use LLMs for report feedback and any other helpful tasks.
+- **Individual Implementation**: For your own learning, we encourage you NOT to use AI to solve the core model implementation (logistic regression, gradient computation, age vectorizer). Going through these manually will help you master gradient descent and SGD concepts. Discuss challenges with classmates and instructors at office hours.
+- **Encouraged AI Use**: You are explicitly encouraged to use AI tools for the full vectorizer, dispatcher, and the Part 2 analyses. Use LLMs for report feedback and any other helpful tasks.
 
 Remember: the key goal is your learning, not top performance. Use AI tools to boost your mastery, not replace learning opportunities.
 
@@ -55,7 +66,7 @@ python check_installation.py
 **Troubleshooting:**
 - Out of space: clean conda cache: `conda clean --all`
 - If conda is unavailable: use system Python 3.10+ and run `pip install -r requirements.txt`
-- Still having issues: ask LLMs, teammates, or come to office hours
+- Still having issues: ask LLMs, classmates, or come to office hours
 
 
 The PLCO dataset files, including a helpful data dictionaries and the raw data csv, are available on bCourses in the "project1_data" folder in "Files".
@@ -66,7 +77,7 @@ The PLCO dataset files, including a helpful data dictionaries and the raw data c
 - `logistic_regression.py`: Model implementation (implement fit, gradient, predict methods)
 - `dispatcher.py`: Hyperparameter search (implement get_experiment_list, launch_experiment)
 
-## Part 1: Model Development - Individual code submissions [50 pts]
+## Part 1: Model Development - Code Submission [50 pts]
 
 In this part of the problem set, you will extend the starter code to develop lung cancer risk models from the PLCO data.
 
@@ -133,8 +144,8 @@ Your final validation AUC should be ≥ **0.80**. This target is achievable with
 - **Poor performance**: Check feature normalization and missing data handling
 - **Gradient explosion**: Verify gradient computation
 
-## Part 2: Evaluation - Team Report Submission [50 pts]
-As a team, converge on a single model implementation and perform detailed analysis of model performance. You are encouraged to use AI to help you in this section.
+## Part 2: Evaluation - Report Submission [50 pts]
+Converge on a single model implementation and perform detailed analysis of model performance. You are encouraged to use AI to help you in this section.
 
 ### 2.1: Ablation study
 Include training and validation loss curves and describe your best model implementation details. What design decisions were most important for achieving good performance?
