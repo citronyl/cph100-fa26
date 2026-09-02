@@ -69,7 +69,7 @@ python check_installation.py
 - Still having issues: ask LLMs, classmates, or come to office hours
 
 
-The PLCO dataset files, including a helpful data dictionaries and the raw data csv, are available on bCourses in the "project1_data" folder in "Files".
+The PLCO dataset files, including a helpful data dictionaries and the raw data csv, are available on bCourses in the "pset1_data" folder in "Files". If you are completing this assignment without being officially registered for the class, email Irene and she will send you the data directly.
 
 ### Code Structure Overview
 - `main.py`: Main training loop (modify feature_config here)
