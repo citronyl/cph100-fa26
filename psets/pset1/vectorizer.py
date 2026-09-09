@@ -9,6 +9,7 @@ class Vectorizer:
     """
     def __init__(self, feature_config, num_bins=5):
         self.feature_config = feature_config
+        self.num_bins=5
         self.feature_transforms = {}
         self.is_fit = False
 
@@ -17,9 +18,12 @@ class Vectorizer:
         :return: function to map numerical x to a zero mean, unit std dev normalized score.
         """
 
-        mean, std = None, None
+        mean, std = np.mean(values), np.std(values)
 
-        raise NotImplementedError("Numerical vectorizer not implemented yet")
+        if std == 0:
+            std = 1.0
+
+        #raise NotImplementedError("Numerical vectorizer not implemented yet")
 
         def vectorizer(x):
             """
@@ -28,12 +32,26 @@ class Vectorizer:
 
             Hint: this fn knows mean and std from the outer scope
             """
-            NotImplementedError("Not implemented")
+
+            return (x-mean)/std
+            #NotImplementedError("Not implemented")
 
         return vectorizer
 
     def get_histogram_vectorizer(self, values):
-        raise NotImplementedError("Histogram vectorizer not implemented yet")
+        """
+            :return: function to map continuous x into a one-hot histogram bin vector. 
+        """
+        _, bin_edges = np.histogram(values, bins=self.num_bins)
+
+        def vectorizer(x):
+            """
+            :param x: Single raw feature value for a patient
+            :return: 1D NumPy array representing one-hot bin assignment
+            """
+            bin_idx = np.digitize
+
+        #raise NotImplementedError("Histogram vectorizer not implemented yet")
 
     def get_categorical_vectorizer(self, values):
         """

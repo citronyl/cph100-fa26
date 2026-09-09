@@ -13,7 +13,7 @@ import os
 def add_main_args(parser: argparse.ArgumentParser) -> argparse.ArgumentParser:
     parser.add_argument(
         "--plco_data_path",
-        default="/scratch/project1/plco/lung_prsn.csv",
+        default="lung_prsn.csv",
         help="Location of PLCO csv",
     )
 
@@ -86,7 +86,9 @@ def main(args: argparse.Namespace) -> dict:
     #     "categorical": ["sex", "race7"],     # Features for one-hot encoding
     #     "ordinal": ["educat"]                # Features for integer encoding
     # }
-    feature_config = None
+    feature_config = {
+        "numerical": ["age"]
+    }
 
     print("Initializing vectorizer and extracting features")
     # TODO: Implement a vectorizer to convert the questionnaire features into a feature vector
