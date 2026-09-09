@@ -45,7 +45,7 @@ class LogisticRegression():
                 # update theta and bias by learning rate and gradient
                 self.theta -= self.learning_rate * gradient_theta
                 self.bias -= self.learning_rate * gradient_bias
-        raise NotImplementedError("Not implemented yet")
+        #raise NotImplementedError("Not implemented yet")
 
     def gradient(self, X, Y):
         """

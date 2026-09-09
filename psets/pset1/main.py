@@ -86,12 +86,19 @@ def main(args: argparse.Namespace) -> dict:
     #     "categorical": ["sex", "race7"],     # Features for one-hot encoding
     #     "ordinal": ["educat"]                # Features for integer encoding
     # }
+
     feature_config = {
         "numerical": ["age"]
     }
 
     print("Initializing vectorizer and extracting features")
     # TODO: Implement a vectorizer to convert the questionnaire features into a feature vector
+    # sex 1 = male, 2 = female
+        # lung_cancer 0 = no confirmed cancer, 1 = confirmed cancer
+        # race 1-7, 7 is missing value
+        # educat .F is no form, .M is not answered, 1 to 7 for levels of education
+    
+    
     plco_vectorizer = Vectorizer(feature_config)
 
     # TODO: Fit the vectorizer on the training data (i.e. compute means for normalization, etc)
