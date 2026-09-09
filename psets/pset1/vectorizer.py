@@ -105,6 +105,8 @@ class Vectorizer:
                 values = [row[feature] for row in X if feature in row]
                 self.feature_transforms[feature] = self.get_ordinal_vectorizer(values)
         #self.feature_transforms = { "transform_name": None}
+
+        #updates feature_transforms dict with transform_name: vectorizer function for that feature
         self.is_fit = True
 
 
