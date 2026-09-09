@@ -18,7 +18,7 @@ class Vectorizer:
         :return: function to map numerical x to a zero mean, unit std dev normalized score.
         """
 
-        values = [float(v) for v in values]
+        values = [float(v) for v in values if v is not None and v != '']
         mean, std = np.mean(values), np.std(values)
 
         if std == 0:
@@ -33,7 +33,8 @@ class Vectorizer:
 
             Hint: this fn knows mean and std from the outer scope
             """
-
+            if x is None or x == '':
+                 return np.array([0.0])
             return np.array([(float(x) - mean)/std])
             #NotImplementedError("Not implemented")
 
