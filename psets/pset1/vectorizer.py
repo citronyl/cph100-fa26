@@ -51,8 +51,13 @@ class Vectorizer:
             :param x: Single raw feature value for a patient
             :return: 1D NumPy array representing one-hot bin assignment
             """
-            bin_idx = np.digitize
+            bin_idx = np.digitize(x, bin_edges, right=False) - 1
+            bin_idx = np.clip(bin_idx, 0, self.num_bins - 1)
+            one_hot = np.zeros(self.num_bins, dtype=int)
+            one_hot[bin_idx] = 1.0
 
+            return one_hot
+        return vectorizer
         raise NotImplementedError("Histogram vectorizer not implemented yet")
 
     def get_categorical_vectorizer(self, values):
@@ -61,6 +66,13 @@ class Vectorizer:
         """
 
         # values are not guaranteed to be numerical, so use indexes instead
+
+        cleaned_values = []
+        for v in values:
+            if str(v).upper() in [".F", ".M"]:
+                cleaned_values.append("0")
+            else:
+                cleaned_values.append(v)
 
         unique_cats = sorted(list(set(str(v) for v in values)))
         cat_idx = {cat: idx for idx, cat in enumerate(unique_cats)}
@@ -78,8 +90,29 @@ class Vectorizer:
         raise NotImplementedError("Categorical vectorizer not implemented yet")
 
     def get_ordinal_vectorizer(self, values):
+        """
+        :return: function to map ordinal x to integer feature vector
+        """
+        # replace .F and .M with 0, then sort the unique values and assign an index. 
+        cleaned_values = []
+        for v in values:
+            if str(v).upper() in [".F", ".M"]:
+                cleaned_values.append("0")
+            else:
+                cleaned_values.append(v)
 
-         raise NotImplementedError("Ordinal vectorizer not implemented yet")
+        unique_ords = sorted(list(set(str(v) for v in cleaned_values)))
+        ord_idx = {ord: idx for idx, ord in enumerate(unique_ords)}
+
+        def vectorizer(x):
+            val = str(x)
+            if val in ord_idx:
+                return np.array([ord_idx[val]])
+            return np.array([0])
+
+        return vectorizer
+
+        raise NotImplementedError("Ordinal vectorizer not implemented yet")
     
     def fit(self, X):
         """
