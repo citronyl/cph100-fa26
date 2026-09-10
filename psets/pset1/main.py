@@ -88,7 +88,9 @@ def main(args: argparse.Namespace) -> dict:
     # }
 
     feature_config = {
-        "numerical": ["age"]
+        "numerical": ["age", 'pack_years', 'smokea_f'],
+        "categorical": ["sex", "race7", 'bronchit_f', 'lung_fh'],
+        "ordinal": ["educat", 'bmi_50c']
     }
 
     print("Initializing vectorizer and extracting features")

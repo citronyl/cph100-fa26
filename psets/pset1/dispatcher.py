@@ -4,8 +4,9 @@ import random
 import os, subprocess
 from csv import DictWriter
 import multiprocessing
-import itertools
 import sys
+import uuid
+from pathlib import Path
 
 def add_main_args(parser: argparse.ArgumentParser) -> argparse.ArgumentParser:
     parser.add_argument(
@@ -62,11 +63,17 @@ def get_experiment_list(config: dict) -> list[dict]:
         ]
     '''
     jobs = [{}]
+    parameters = config.get("parameters", config)
+
+    for key, values in parameters.items():
+        value_list = values if isinstance(values, list) else [values]
+        jobs = [{**job, key: val} for job in jobs for val in value_list]
+
+    return jobs
+
 
     # TODO: Go through the tree of possible jobs and enumerate into a list of jobs
     raise NotImplementedError("Not implemented yet")
-
-    return jobs
 
 def worker(args: argparse.Namespace, job_queue: multiprocessing.Queue, done_queue: multiprocessing.Queue):
     '''
@@ -102,17 +109,35 @@ def launch_experiment(args: argparse.Namespace, experiment_config: dict) -> dict
         "val_auc": 0.62
     }
     '''
-
     if not os.path.isdir(args.log_dir):
-        os.makedirs(args.log_dir)
+        os.makedirs(args.log_dir, exist_ok=True)
+
+    unique_id = uuid.uuid4().hex[:8]
+    temp_results_path = os.path.join(args.log_dir, f"results_{unique_id}.json")
+
+    command = [sys.executable, "main.py"]
+    command.extend(["--results_path", temp_results_path])
+    for hyperparameter, value in experiment_config.items():
+        command.extend([f"--{hyperparameter}", str(value)])
 
     # TODO: Launch the experiment
+    subprocess.run(command, check=True)
 
     # TODO: Parse the results from the experiment and return them as a dict
+    train_auc, val_auc = None, None
 
-    raise NotImplementedError("Not implemented yet")
+    with open(temp_results_path, "r", encoding="utf-8") as f:
+        data = json.load(f)
+        train_auc = data.get("train_auc")
+        val_auc = data.get("val_auc")
+    # os.remove(temp_results_path) # I think I'm supposed to keep the results from the experiment?
 
-    results = {}
+    results = {
+        **experiment_config,
+        "train_auc": train_auc,
+        "val_auc": val_auc
+    }
+    
     return results
 
 
@@ -149,14 +174,20 @@ def main(args: argparse.Namespace) -> list[dict]:
     for _ in range(len(experiments)):
         grid_search_results.append(done_queue.get())
 
+    print("Sorting Results")
+    grid_search_results.sort(
+            key=lambda x: x["val_auc"],
+            reverse=True,
+       )
+
     keys = grid_search_results[0].keys()
 
     print("Saving results to {}".format(args.grid_search_results_path))
-
+    
     writer = DictWriter(open(args.grid_search_results_path, 'w'), keys)
     writer.writeheader()
     writer.writerows(grid_search_results)
-
+    
     print("Done")
     return grid_search_results
 
