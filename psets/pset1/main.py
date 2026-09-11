@@ -134,6 +134,10 @@ def main(args: argparse.Namespace) -> dict:
     pred_val_Y = model.predict_proba(val_X)
 
     results = {
+        "learning_rate": args.learning_rate,
+        "batch_size": args.batch_size,
+        "num_epochs": args.num_epochs,
+        "regularization_lambda": args.regularization_lambda,
         "train_auc": roc_auc_score(train_Y, pred_train_Y),
         "val_auc": roc_auc_score(val_Y, pred_val_Y)
     }
