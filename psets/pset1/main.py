@@ -1,6 +1,5 @@
-
 import argparse
-import json
+import csv
 from csv import DictReader
 from vectorizer import Vectorizer
 from logistic_regression import LogisticRegression
@@ -155,9 +154,49 @@ def main(args: argparse.Namespace) -> dict:
 
     # Compute AUC on test set and print for submission. Note, you should not use test set to tune your model.
     # Uncomment these lines only when you're ready for final evaluation:
-    # pred_test_Y = model.predict_proba(test_X)
-    # test_auc = roc_auc_score(test_Y, pred_test_Y)
-    # print(f"Test AUC: {test_auc:.4f}")
+    pred_test_Y = model.predict_proba(test_X)
+    pred_test_choice = model.predict(test_X, threshold=0.5)
+    
+    with open("test_predictions.csv", "w", newline="") as f:
+        writer = csv.writer(f)
+        writer.writerow([
+            "lung_cancer",
+            "model_pred",
+            "model_prob",
+            "sex",
+            "race7",
+            "educat",
+            "cig_stat",
+            "nlst_flag"
+        ])
+        for row, prob, choice in zip(test, pred_test_Y, pred_test_choice):
+            writer.writerow([
+                row["lung_cancer"],
+                choice,
+                prob,
+                row["sex"],
+                row["race7"],
+                row["educat"],
+                row["cig_stat"],
+                row["nlst_flag"],
+            ])
+
+    weights_data = {
+        "weights": (
+            model.theta.tolist()
+            if hasattr(model.theta, "tolist")
+            else list(model.theta)
+        ),
+        "bias": float(model.bias) if hasattr(model, "bias") else 0.0,
+        "feature_names": plco_vectorizer.get_feature_names()
+    }
+    with open("model_weights.json", "w") as f:
+        json.dump(weights_data, f, indent=2)
+
+    print("Saved predictions and model successfully")
+
+    test_auc = roc_auc_score(test_Y, pred_test_Y)
+    print(f"Test AUC: {test_auc:.4f}")
 
     print("Done")
 

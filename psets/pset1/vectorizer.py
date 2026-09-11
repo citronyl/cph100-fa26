@@ -11,6 +11,7 @@ class Vectorizer:
         self.feature_config = feature_config
         self.num_bins=5
         self.feature_transforms = {}
+        self.feature_names = []
         self.is_fit = False
 
     def get_numerical_vectorizer(self, values, verbose=False):
@@ -126,18 +127,25 @@ class Vectorizer:
         for feature in self.feature_config.get("numerical", []):
             values = [row[feature] for row in X if feature in row]
             self.feature_transforms[feature] = self.get_numerical_vectorizer(values)
+            self.feature_names.append(feature)
 
         for feature in self.feature_config.get("categorical", []):
                 values = [row[feature] for row in X if feature in row]
                 self.feature_transforms[feature] = self.get_categorical_vectorizer(values)
+                unique_cats = sorted(list(set(str(v) for v in values)))
+                for cat in unique_cats:
+                    self.feature_names.append(f"{feature}_{cat}")
 
         for feature in self.feature_config.get("histogram", []):
                 values = [row[feature] for row in X if feature in row]
                 self.feature_transforms[feature] = self.get_histogram_vectorizer(values)
+                for bin_i in range(self.num_bins):
+                    self.feature_names.append(f"{feature}_bin_{bin_i}")
 
         for feature in self.feature_config.get("ordinal", []):
                 values = [row[feature] for row in X if feature in row]
                 self.feature_transforms[feature] = self.get_ordinal_vectorizer(values)
+                self.feature_names.append(feature)
         #self.feature_transforms = { "transform_name": None}
 
         #updates feature_transforms dict with transform_name: vectorizer function for that feature
