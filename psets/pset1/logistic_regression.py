@@ -12,8 +12,10 @@ class LogisticRegression():
         self.batch_size = batch_size
         self.verbose = verbose
         self.regularization_lambda = regularization_lambda
+        self.train_loss = []
+        self.val_loss = []
 
-    def fit(self, X, Y):
+    def fit(self, X, Y, X_val=None, Y_val=None):
         """
             Train the logistic regression model using stochastic gradient descent.
         """
@@ -45,6 +47,19 @@ class LogisticRegression():
                 # update theta and bias by learning rate and gradient
                 self.theta -= self.learning_rate * gradient_theta
                 self.bias -= self.learning_rate * gradient_bias
+
+            p_train = self.predict_proba(X)
+            loss_train = -np.mean(
+                Y * np.log(p_train) + (1-Y) * np.log(1 - p_train)
+            )
+            self.train_loss.append(float(loss_train))
+
+            if X_val is not None and Y_val is not None:
+                p_val = self.predict_proba(X_val)
+                loss_v = -np.mean(
+                    Y_val * np.log(p_val) + (1-Y_val) * np.log(1 - p_val)
+                )
+                self.val_loss.append(float(loss_v))
         #raise NotImplementedError("Not implemented yet")
 
     def gradient(self, X, Y):

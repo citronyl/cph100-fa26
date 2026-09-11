@@ -125,7 +125,11 @@ def main(args: argparse.Namespace) -> dict:
         verbose=True
     )
 
-    model.fit(train_X, train_Y)
+    model.fit(train_X, train_Y, X_val=val_X, Y_val=val_Y)
+    with open("loss_history.json", "w") as f:
+        json.dump({"train_loss": model.train_loss, "val_loss": model.val_loss}
+        , f, indent=2
+        )
 
     print("Evaluating model")
 
