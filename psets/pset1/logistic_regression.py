@@ -74,7 +74,7 @@ class LogisticRegression():
 
         # get gradient for theta by taking binary cross entropy loss function and finding the derivative through chain rule
         # and adding derivative of L2 regularization function to that
-        gradient_theta = (1.0/N) * np.dot(X.T, error) + (self.regularization_lambda * self.theta)
+        gradient_theta = (1.0/N) * (np.dot(X.T, error) + (self.regularization_lambda * self.theta))
         gradient_bias = (1.0/N) * np.sum(error)
 
         return gradient_theta, gradient_bias
