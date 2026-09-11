@@ -51,6 +51,22 @@ def generate_model():
 def main():
     generate_model()
 
+    tuning = pd.read_csv("grid_results.csv")
+
+    tuning = tuning.sort_values("regularization_lambda")
+
+    plt.figure(figsize=(8, 5))
+    plt.plot(tuning["regularization_lambda"], tuning["train_loss"], marker="o", linewidth=2)
+    plt.xscale("log")  # Log scale is recommended since lambda spans orders of magnitude
+    plt.xlabel("L2 Regularization Lambda (log scale)")
+    plt.ylabel("Training Loss")
+    plt.title("L2 Regularization vs. Training Loss")
+    plt.grid(True, which="both", linestyle="--", alpha=0.5)
+
+    plt.tight_layout()
+    plt.savefig("l2_vs_train_loss.png")
+    print("L2 vs train loss saved")
+
     print("2.1 LOSS CURVES")
     if os.path.exists("loss_history.json"):
         with open("loss_history.json", "r") as f:

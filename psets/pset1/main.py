@@ -122,7 +122,7 @@ def main(args: argparse.Namespace) -> dict:
         learning_rate=args.learning_rate, 
         batch_size=args.batch_size, 
         regularization_lambda=args.regularization_lambda, 
-        verbose=True
+        verbose=False
     )
 
     model.fit(train_X, train_Y, X_val=val_X, Y_val=val_Y)
@@ -141,6 +141,7 @@ def main(args: argparse.Namespace) -> dict:
         "batch_size": args.batch_size,
         "num_epochs": args.num_epochs,
         "regularization_lambda": args.regularization_lambda,
+        "train_loss": model.train_loss[-1],
         "train_auc": roc_auc_score(train_Y, pred_train_Y),
         "val_auc": roc_auc_score(val_Y, pred_val_Y)
     }

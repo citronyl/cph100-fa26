@@ -86,7 +86,8 @@ class LogisticRegression():
         """
         # model definition
         z = np.dot(X, self.theta) + self.bias
-        p = 1.0 / (1.0 + np.exp(-z))
+        z_clipped = np.clip(z, -500, 500)
+        p = 1.0 / (1.0 + np.exp(-z_clipped))
 
         #clipping p to avoid probabilities too close to 0 or 1 (improves stability)
         epsilon = 1e-6

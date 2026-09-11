@@ -7,6 +7,7 @@ import multiprocessing
 import sys
 import uuid
 from pathlib import Path
+from tqdm import tqdm
 
 def add_main_args(parser: argparse.ArgumentParser) -> argparse.ArgumentParser:
     parser.add_argument(
@@ -128,12 +129,14 @@ def launch_experiment(args: argparse.Namespace, experiment_config: dict) -> dict
 
     with open(temp_results_path, "r", encoding="utf-8") as f:
         data = json.load(f)
+        train_loss = data.get("train_loss")
         train_auc = data.get("train_auc")
         val_auc = data.get("val_auc")
     # os.remove(temp_results_path) # I think I'm supposed to keep the results from the experiment?
 
     results = {
         **experiment_config,
+        "train_loss": train_loss,
         "train_auc": train_auc,
         "val_auc": val_auc
     }
@@ -171,7 +174,7 @@ def main(args: argparse.Namespace) -> list[dict]:
 
     # Accumualte results into a list of dicts
     grid_search_results = []
-    for _ in range(len(experiments)):
+    for _ in tqdm(range(len(experiments)), desc="Grid Search Progress"):
         grid_search_results.append(done_queue.get())
 
     print("Sorting Results")

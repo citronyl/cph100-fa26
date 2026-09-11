@@ -3,6 +3,7 @@
  "learning_rate": 0.01,
  "num_epochs": 1000,
  "regularization_lambda": 0.01,
- "train_auc": 0.8079778674083642,
- "val_auc": 0.82987395191759
+ "train_auc": 0.8100157901270765,
+ "train_loss": 0.10212409054469355,
+ "val_auc": 0.8311408493587995
 }
