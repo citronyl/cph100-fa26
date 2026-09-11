@@ -1,0 +1,8 @@
+{
+ "batch_size": 64,
+ "learning_rate": 0.01,
+ "num_epochs": 1000,
+ "regularization_lambda": 0.01,
+ "train_auc": 0.8079778674083642,
+ "val_auc": 0.82987395191759
+}
