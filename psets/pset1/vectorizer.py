@@ -178,3 +178,8 @@ class Vectorizer:
         #raise NotImplementedError("Not implemented yet")
 
         return np.array(transformed_data)
+
+    def get_feature_names(self):
+        if not self.is_fit:
+            raise Exception("Vectorizer not intialized! You must first call fit with a training set" )
+        return self.feature_names
