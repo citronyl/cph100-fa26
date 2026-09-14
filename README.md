@@ -6,6 +6,7 @@ Precision Health** at UC Berkeley, Fall 2026.
 | Problem Set | Topic |
 |---|---|
 | [Problem Set 1](psets/pset1/README.md) | Designing lung cancer screening programs with machine learning |
+| [Problem Set 2](psets/pset2/README.md) | Building medical imaging tools with deep learning |
 
 Each problem set folder holds the writeup and the starter code. Start
 with the problem set's `README.md`.
