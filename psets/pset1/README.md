@@ -99,7 +99,7 @@ where $y$ is the true label, $p$ is the predicted probability, and $\lambda$ is 
 **Implementation Steps:**
 1. Extract age data (column name: `"age"`) from the PLCO CSV
 2. Implement feature normalization in `vectorizer.py`
-3. Derive and implement the gradient equations in `logistic_regression.py`. Note, you may way to review the lecture slides or recording.
+3. Derive and implement the gradient equations in `logistic_regression.py`. Note, you may way to review the lecture slides.
     - Recall the stability trick noted in lecture.
 4. Implement SGD training loop
 
