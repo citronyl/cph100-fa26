@@ -1,6 +1,6 @@
 # Core PyTorch (CPU-compatible versions)
-torch==2.0
-torchvision==0.15
+torch>=2.0
+torchvision>=0.15
 
 # Medical imaging datasets
 medmnist==2.2
