@@ -55,7 +55,7 @@ if __name__ == "__main__":
     
     parser = argparse.ArgumentParser(description='CPH 100A Problem Set 2 - PathMNIST Classification')
     parser.add_argument('--model_name', type=str, default='mlp',
-                       choices=['mlp', 'cnn'], #TODO: add your models names here
+                       choices=['mlp', 'cnn', 'linear'], #TODO: add your models names here
                        help='Model to train')
     parser.add_argument('--learning_rate', type=float, default=0.001,
                        help='Learning rate for training')

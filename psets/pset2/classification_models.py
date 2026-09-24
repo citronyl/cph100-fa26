@@ -7,6 +7,23 @@ import torch
 import torch.nn as nn
 import torch.nn.functional as F
 
+class LinearModel(nn.Module):
+    """
+    Linear Model:
+    """
+
+    def __init__(self, num_classes=9):
+        super(LinearModel, self).__init__()
+
+        input_size = 3 * 28 * 28
+        self.layer = nn.Linear(input_size, num_classes)
+
+    def forward(self, x):
+        x = torch.flatten(x, start_dim=1)
+        result = self.layer(x)
+        return result
+
+
 
 class MLPModel(nn.Module):
     """
@@ -43,6 +60,8 @@ def get_model(model_name, num_classes=9):
         return MLPModel(num_classes)
     elif model_name == 'cnn':
         return CNNModel(num_classes)
+    elif model_name == 'linear':
+        return LinearModel(num_classes)
     else:
         #TODO: add your models names here
         raise ValueError("Unknown model: {}".format(model_name))
