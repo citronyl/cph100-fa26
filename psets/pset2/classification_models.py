@@ -34,11 +34,20 @@ class MLPModel(nn.Module):
         super(MLPModel, self).__init__()
         
         # PathMNIST images are 3x28x28 = 2352 features
-        input_size = 3 * 28 * 28
-        
         # TODO: Add your own MLP architecture here
-    
+        input_size = 3 * 28 * 28
+        hidden1 = 512
+        hidden2 = 256
+        self.l1 = nn.Linear(input_size, hidden1)
+        self.l2 = nn.Linear(hidden1, hidden2)
+        self.l3 = nn.Linear(hidden2, num_classes)
+
     def forward(self, x):
+        x = torch.flatten(x, start_dim=1)
+        h1 = F.relu(self.l1(x))
+        h2 = F.relu(self.l2(h1))
+        result = self.l3(h2)
+        return result
         raise NotImplementedError("MLPModel is not implemented")
 
 class CNNModel(nn.Module):
