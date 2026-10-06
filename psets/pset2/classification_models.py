@@ -48,7 +48,6 @@ class MLPModel(nn.Module):
         h2 = F.relu(self.l2(h1))
         result = self.l3(h2)
         return result
-        raise NotImplementedError("MLPModel is not implemented")
 
 class CNNModel(nn.Module):
     """
@@ -59,8 +58,31 @@ class CNNModel(nn.Module):
         super(CNNModel, self).__init__()
         
         # TODO: Add your own CNN architecture here
+        outConv1 = 64
+        outConv2 = 128
+        outConv3 = 256
+
+        self.conv1 = nn.Conv2d(3, outConv1, 3, stride = 1, padding = 1)
+        self.conv2 = nn.Conv2d(outConv1, outConv2, 3, stride = 1, padding = 1)
+        self.conv3 = nn.Conv2d(outConv2, outConv3, 3, stride = 1, padding = 1)
+        self.layer = nn.Linear(outConv3 * 14 * 14, num_classes)
+
     
     def forward(self, x):
+        x = self.conv1(x) 
+        x = F.relu(x)
+        #x = F.max_pool2d(x, 2)
+
+        x = self.conv2(x)
+        x = F.relu(x)
+        x = F.max_pool2d(x, 2)
+
+        x = self.conv3(x)
+        x = F.relu(x)
+
+        x = torch.flatten(x, start_dim=1)
+        result = self.layer(x)
+        return result
         raise NotImplementedError("CNNModel is not implemented")
 
 def get_model(model_name, num_classes=9):
