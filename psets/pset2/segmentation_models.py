@@ -7,6 +7,25 @@ import torch
 import torch.nn as nn
 import torch.nn.functional as F
 
+class LinearSegmentation(nn.Module):
+    """
+    Simple linear model for segmentation.
+    Flattens input and reshapes to output mask.
+    """
+
+    def __init__(self, in_channels=3, out_channels=1):
+        super(LinearSegmentation, self).__init__()
+
+        self.layer = nn.Linear(in_channels*28*28, out_channels*28*28)
+
+    def forward(self, x):
+        x = torch.flatten(x, start_dim=1)
+        x = self.layer(x)
+        x = x.reshape(x.size(0), out_channels, 28, 28)
+        result = torch.sigmoid(x)
+        return result
+
+
 
 class MLPSegmentation(nn.Module):
     """
@@ -47,6 +66,8 @@ def get_segmentation_model(model_name, in_channels=3, out_channels=1):
         return MLPSegmentation(in_channels=in_channels, out_channels=out_channels)
     elif model_name == 'unet':
         return TinyUNet(in_channels=in_channels, out_channels=out_channels)
+    elif model_name =='linear':
+        return LinearSegmentation(in_channels=in_channels, out_channels=out_channels)
     else:
         raise ValueError("Unknown segmentation model: {}".format(model_name))
 
