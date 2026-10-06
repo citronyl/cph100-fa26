@@ -17,7 +17,7 @@ def main(args):
     print("Loading PathMNIST dataset...")
     train_loader, val_loader, num_classes = create_pathmnist_dataloaders(
         batch_size=32,
-        num_workers=0,
+        num_workers=4,
         data_root='./data'
     )
     
@@ -35,7 +35,7 @@ def main(args):
             epochs=args.num_epochs,
             learning_rate=args.learning_rate,
             weight_decay=args.weight_decay,
-            max_steps_per_epoch=100  # Fast exploration mode. #TODO: Change for your full runs
+            max_steps_per_epoch=None  # Fast exploration mode. #TODO: Change for your full runs
         )
         
         print("Training completed successfully!")
