@@ -238,7 +238,7 @@ def box_collate_fn(batch):
     """Custom collate function for black box dataset."""
     images = torch.stack([item['image'] for item in batch])
     masks = torch.stack([item['mask'] for item in batch])
-    pathmnist_labels = torch.tensor([item['pathmnist_label'] for item in batch])
+    pathmnist_labels = torch.tensor(np.array([item['pathmnist_label'] for item in batch]))
     has_boxes = torch.stack([item['has_box'] for item in batch])
     
     return {
