@@ -24,7 +24,7 @@ def main(args):
     
     train_loader, val_loader, test_loader, num_classes = create_box_dataloaders(
         batch_size=32,
-        num_workers=0,
+        num_workers=4,
         data_root='./data'
     )
     
@@ -92,7 +92,7 @@ if __name__ == "__main__":
     
     parser = argparse.ArgumentParser(description='PathMNIST Black Box Segmentation')
     parser.add_argument('--model_name', type=str, default='unet',
-                       choices=['mlp', 'unet'], #TODO: add your models names here
+                       choices=['mlp', 'unet', 'linear'], #TODO: add your models names here
                        help='Segmentation model to train')
     parser.add_argument('--learning_rate', type=float, default=0.001,
                        help='Learning rate for training')
