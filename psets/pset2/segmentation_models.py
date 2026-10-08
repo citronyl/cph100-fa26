@@ -110,8 +110,43 @@ class TinyUNet(nn.Module):
         
         # Encoder (contracting path)
         # TODO: Add your own encoder architecture here
+        outConv1 = 128
+        outConv2 = 256
+        outConv3 = 512
+        self.conv1 = nn.Conv2d(in_channels, outConv1, 3, stride = 1, padding = 1)
+        self.conv2 = nn.Conv2d(outConv1, outConv2, 3, stride = 1, padding = 1)
+        self.conv3 = nn.Conv2d(outConv2, outConv3, 3, stride = 1, padding = 1)
+        self.up1 = nn.ConvTranspose2d(outConv3, outConv2, kernel_size= 2, stride = 2)
+        self.dec1 = nn.Conv2d(2*outConv2, outConv2, 3, 1, 1)
+        self.up2 = nn.ConvTranspose2d(outConv2, outConv1, 2, 2)
+        self.dec2 = nn.Conv2d(2*outConv1, outConv1, 3, 1, 1)
+        self.out = nn.Conv2d(outConv1, out_channels, kernel_size=1)
     
     def forward(self, x):
+        enc1 = self.conv1(x)
+        enc1 = F.relu(enc1)
+        out1 = F.max_pool2d(enc1, 2)
+
+        enc2 = self.conv2(out1)
+        enc2 = F.relu(enc2)
+        out2 = F.max_pool2d(enc2, 2)
+
+        enc3 = self.conv3(out2)
+        enc3 = F.relu(enc3)
+
+        up1 = self.up1(enc3)
+        skip1 = torch.cat([up1, enc2], dim=1)
+        dec1 = self.dec1(skip1)
+        dec1 = F.relu(dec1)
+
+        up2 = self.up2(dec1)
+        skip2 = torch.cat([up2, enc1], dim=1)
+        dec2 = self.dec2(skip2)
+        dec2 = F.relu(dec2)
+
+        result = torch.sigmoid(self.out(dec2))
+        return result
+
         raise NotImplementedError("TinyUNet is not implemented")
         
 
