@@ -64,7 +64,7 @@ def main(args):
         epochs=args.num_epochs,
         learning_rate=args.learning_rate,
         weight_decay=args.weight_decay,
-        max_steps_per_epoch=100  # Fast exploration mode
+        max_steps_per_epoch=None  # Fast exploration mode
     )
     
     # Evaluate model on validation set
