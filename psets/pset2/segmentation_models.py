@@ -17,11 +17,12 @@ class LinearSegmentation(nn.Module):
         super(LinearSegmentation, self).__init__()
 
         self.layer = nn.Linear(in_channels*28*28, out_channels*28*28)
+        self.out_channels = out_channels
 
     def forward(self, x):
         x = torch.flatten(x, start_dim=1)
         x = self.layer(x)
-        x = x.reshape(x.size(0), out_channels, 28, 28)
+        x = x.reshape(x.size(0), self.out_channels, 28, 28)
         result = torch.sigmoid(x)
         return result
 
