@@ -58,6 +58,46 @@ class MLPSegmentation(nn.Module):
         result = torch.sigmoid(result)
         return result
         raise NotImplementedError("MLPSegmentation is not implemented")
+        
+class CNNSegmentation(nn.Module):
+    def __init__(self, in_channels=3, out_channels=1):
+        super(CNNSegmentation, self).__init__()
+        outConv1 = 128
+        outConv2 = 256
+        outConv3 = 512
+        self.conv1 = nn.Conv2d(in_channels, outConv1, 3, stride = 1, padding = 1)
+        self.conv2 = nn.Conv2d(outConv1, outConv2, 3, stride = 1, padding = 1)
+        self.conv3 = nn.Conv2d(outConv2, outConv3, 3, stride = 1, padding = 1)
+        self.up1 = nn.ConvTranspose2d(outConv3, outConv2, kernel_size= 2, stride = 2)
+        self.dec1 = nn.Conv2d(outConv2, outConv2, 3, 1, 1)
+        self.up2 = nn.ConvTranspose2d(outConv2, outConv1, 2, 2)
+        self.dec2 = nn.Conv2d(outConv1, outConv1, 3, 1, 1)
+        self.out = nn.Conv2d(outConv1, out_channels, kernel_size=1)
+
+    def forward(self, x):
+        x = self.conv1(x)
+        x = F.relu(x)
+        x = F.max_pool2d(x, 2)
+
+        x = self.conv2(x)
+        x = F.relu(x)
+        x = F.max_pool2d(x, 2)
+
+        x = self.conv3(x)
+        x = F.relu(x)
+        # 256 * 7 * 7
+
+        x = self.up1(x)
+        x = self.dec1(x)
+        x = F.relu(x)
+
+        x = self.up2(x)
+        x = self.dec2(x)
+        x = F.relu(x)
+
+        x = self.out(x)
+        result = torch.sigmoid(x)
+        return result
 
 class TinyUNet(nn.Module):
     """
@@ -83,6 +123,8 @@ def get_segmentation_model(model_name, in_channels=3, out_channels=1):
         return TinyUNet(in_channels=in_channels, out_channels=out_channels)
     elif model_name =='linear':
         return LinearSegmentation(in_channels=in_channels, out_channels=out_channels)
+    elif model_name =='cnn':
+        return CNNSegmentation(in_channels=in_channels, out_channels=out_channels)
     else:
         raise ValueError("Unknown segmentation model: {}".format(model_name))
 
