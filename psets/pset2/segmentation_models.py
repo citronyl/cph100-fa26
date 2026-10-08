@@ -126,7 +126,15 @@ class DiceLoss(nn.Module):
     
     def forward(self, pred, target):
         #TODO: Compute the DICE loss
-        loss = 0 # TODO: Compute the DICE loss
+        pred = torch.flatten(pred, start_dim = 1)
+        target = torch.flatten(target, start_dim = 1)
+
+        overlap = torch.multiply(pred, target).sum(dim=1)
+        pred_total = pred.sum(dim=1)
+        target_total = target.sum(dim=1)
+
+        Dice = (2 * overlap + self.smooth) / (pred_total + target_total + self.smooth)
+        loss =  (1-Dice).mean()# TODO: Compute the DICE loss
         return loss 
 
 class CombinedLoss(nn.Module):
@@ -136,8 +144,10 @@ class CombinedLoss(nn.Module):
     
     def __init__(self, bce_weight=0.5, dice_weight=0.5):
         super(CombinedLoss, self).__init__()
-        self.bce_loss = None # TODO: Initialize the component losses and store the loss weights
-        self.dice_loss = None # TODO: Initialize the component losses and store the loss weights
+        self.bce_loss = nn.BCELoss() # TODO: Initialize the component losses and store the loss weights
+        self.bce_weight = bce_weight
+        self.dice_loss = DiceLoss() # TODO: Initialize the component losses and store the loss weights
+        self.dice_weight = dice_weight
     
     def forward(self, pred, target):
         bce = self.bce_loss(pred, target)
