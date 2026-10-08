@@ -7,3 +7,4 @@ env/
 *.csv
 logs/
 data/
+visualizations/
