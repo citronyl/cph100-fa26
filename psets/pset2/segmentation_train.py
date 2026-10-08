@@ -127,7 +127,7 @@ def validate_segmentation_epoch(model, val_loader, criterion, device):
             predictions = model(images) # TODO: Compute the predictions
 
             #TODO: Compute the loss
-            loss = criterion(predictions) # TODO: Compute the loss
+            loss = criterion(predictions, masks) # TODO: Compute the loss
             
             # Calculate IoU for this batch
             iou = calculate_iou(predictions, masks)
