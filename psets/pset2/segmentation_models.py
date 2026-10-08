@@ -41,8 +41,22 @@ class MLPSegmentation(nn.Module):
         # Output should be 1x28x28 = 784 features
         
         # TODO: Add your own MLP architecture here
+        hidden1 = 512
+        hidden2 = 256
+
+        self.l1 = nn.Linear(in_channels*28*28, hidden1)
+        self.l2 = nn.Linear(hidden1, hidden2)
+        self.l3 = nn.Linear(hidden2, out_channels*28*28)
+        self.out_channels = out_channels
     
     def forward(self, x):
+        x = torch.flatten(x, start_dim=1)
+        h1 = F.relu(self.l1(x))
+        h2 = F.relu(self.l2(h1))
+        result = self.l3(h2)
+        result = result.reshape(result.size(0), self.out_channels, 28, 28)
+        result = torch.sigmoid(result)
+        return result
         raise NotImplementedError("MLPSegmentation is not implemented")
 
 class TinyUNet(nn.Module):
