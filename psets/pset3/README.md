@@ -1,6 +1,6 @@
 # Diabetes Readmission Risk Stratification and Dataset Shift
 #### CPH 100A Problem Set 3
-#### Due Date: TBD
+#### Due Date: Fri Oct 30
 
 ## Introduction
 
@@ -10,11 +10,11 @@ This assignment is adapted from the *CPH 200C Computational Precision Health Cor
 
 ## Deliverables
 
-There are no teams. Each student must submit their own **code** and **report**. You may discuss concepts with classmates, but your submission must be your own. Include the names of collaborators.
+There are no teams. Each student must submit their own **code** and **report**. You may discuss concepts with classmates, but your submission must be your own. 
 
 **Code submission:** Completed model development and evaluation code, three LLM prompting variants, saved LLM responses/predictions (no API secrets), and plotting scripts.
 
-**Report submission:** Point-by-point answers to Parts 1–3, plots, model comparisons, and a discussion of limitations. Submit via Gradescope; the deadline will be announced separately.
+**Report submission:** Point-by-point answers to Parts 1–3, plots, model comparisons, and a discussion of limitations. Submit via bCourses.
 
 ### Use of AI in this problem set
 
@@ -58,7 +58,7 @@ python llm_eval.py --sample outputs/llm_sample.csv --format structured --dry-run
 
 The `--dry-run` command previews the two provided prompt formats. The `alternative` format requires you to implement its TODO first. To make live API calls, obtain a free key from [GroqCloud](https://console.groq.com), set `GROQ_API_KEY` in your environment (never put it in code), and remove `--dry-run`. The default model is `openai/gpt-oss-20b`. The [Groq free-plan limits](https://console.groq.com/docs/rate-limits) can change and include request **and token** quotas. For a sample of 200 encounters and three formats, expect up to 600 calls; you may need to spread calls over more than one day. You may instead use another accessible API model, documenting its name and limitations. The API code caches responses locally, so rerunning should not repeat completed requests.
 
-## Part 1: Diabetes Risk Stratification and Dataset Shift [25 pts]
+## Part 1: Diabetes Risk Stratification and Dataset Shift 
 
 ### 1.1 Data Exploration
 
@@ -90,15 +90,15 @@ Train your best **linear model** using encounters of patients **younger than 50*
 
 Compare the LLM's performance on patients under 50 versus 50 or older, using the same LLM predictions collected for Part 1.3. Comment on the uncertainty of subgroup estimates.
 
-## Part 2: FDA Request for Comments [4 pts]
+## Part 2: FDA Request for Comments
 
 On January 7, 2025, the FDA issued [draft guidance on AI-enabled device software functions](https://www.fda.gov/regulatory-information/search-fda-guidance-documents/artificial-intelligence-enabled-device-software-functions-lifecycle-management-and-marketing-submission). Read the draft guidance and describe **one or two notable aspects**.
 
 Choose one public comment submitted in response to the FDA's request for comments, read it closely, and identify its author and position. What are they advocating, and how might their institutional role (industry, academia, clinical care or other sector) inform their position? The original assignment cited the April 7, 2025 comment deadline and 107 comments; those figures are historical and may no longer match the live docket. Include a link to the specific comment you read.
 
-## Part 3: Feedback [1 pt]
+## Part 3: Feedback
 
-How long did this problem set take you, in hours? You may optionally describe your use of LLMs and suggestions for improving the assignment. Any response receives credit.
+This is a new problem set (compared to Problem Set 1 and 2). How long did this problem set take you, in hours? You may optionally describe your use of LLMs and suggestions for improving the assignment. 
 
 ## References
 
