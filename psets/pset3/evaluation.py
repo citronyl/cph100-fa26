@@ -25,12 +25,10 @@ def plot_readmission_rates(frame, output_dir):
     fig.tight_layout()
     fig.savefig(Path(output_dir) / "readmission_by_demographics.png", dpi=150)
     plt.close(fig)
-        
-    #raise NotImplementedError("Student TODO: demographic exploration")
 
 def compute_auc(y_true, probabilities):
     """TODO: Compute ROC AUC from predicted probabilities (not class labels)."""
-    raise NotImplementedError("Student TODO: AUC")
+    return auc_confidence_interval(y_true, probabilities)
 
 
 def auc_confidence_interval(y_true, probabilities, seed=42, confidence=0.95,
