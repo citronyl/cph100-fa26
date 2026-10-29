@@ -6,6 +6,7 @@ from data_utils import load_data, add_age_group, split_data, make_llm_sample, mo
 from evaluation import plot_readmission_rates, compute_auc, auc_confidence_interval, compare_models
 from models import tune_model
 
+NO_READMIT_CODES = [11, 13, 14, 19, 20, 21]
 def run_experiments(frame, seeds, patient_disjoint):
     """Tune each model family on val, eval winner on test, per split."""
     design = "patient" if patient_disjoint else "encounter"
@@ -47,7 +48,9 @@ def main():
     ap.add_argument("--seeds", type=int, nargs="+", default=[42, 43, 44])
     args = ap.parse_args()
     frame = add_age_group(load_data(args.data))
-    train, val, test = split_data(frame, seed=args.seed, patient_disjoint=args.patient_disjoint)
+    #train, val, test = split_data(frame, seed=args.seed, patient_disjoint=args.patient_disjoint)
+    cohort = frame[~frame["discharge_disposition_id"].isin(NO_READMIT_CODES)]
+    train, val, test = split_data(cohort, seed=args.seed, patient_disjoint=args.patient_disjoint)
     if args.inspect:
         print(f"Full dataset: {len(frame)} rows; positives: {frame.target.mean():.3f}")
         for label, part in (("train", train), ("val", val), ("test", test)):
@@ -68,8 +71,8 @@ def main():
         files = sorted(Path("outputs").glob("model_results_*.csv"))
         results = pd.concat([pd.read_csv(f) for f in files])
         compare_models(results, Path("outputs"))
-    if not args.inspect or args.make_llm_sample or args.explore or args.compare:
-        results = run_experiments(frame, args.seeds, args.patient_disjoint)
+    if not (args.inspect or args.make_llm_sample or args.explore or args.compare):
+        results = run_experiments(cohorts, args.seeds, args.patient_disjoint)
         print(results)
 
 

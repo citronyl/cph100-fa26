@@ -10,10 +10,12 @@ from sklearn.model_selection import ParameterGrid
 from data_utils import model_features
 from evaluation import compute_auc
 
+CODE_COLUMNS = ["admission_type_id", "discharge_disposition_id", "admission_source_id"]
+
 def build_preprocessor(X_train):
     """Return an unfitted preprocessing transformer for diabetes features.
 
-    Numeric columns: median imputation. Categorical columns: most-frequent
+    Numeric columns: median imputation. Categorical columns: constant
     imputation followed by one-hot encoding with unknown categories ignored.
     The returned transformer must be fitted ONLY on the training partition.
     """
@@ -23,9 +25,10 @@ def build_preprocessor(X_train):
     from sklearn.preprocessing import OneHotEncoder, StandardScaler
 
     # The caller supplies feature columns, not labels or patient identifiers.
-    excluded = {"readmitted", "target", "encounter_id", "patient_nbr", "age_group"}
+    excluded = {"readmitted", "target", "encounter_id", "patient_nbr", "age_group", "weight"}
     feature_names = [c for c in X_train.columns if c not in excluded]
-    numeric = X_train[feature_names].select_dtypes(include="number").columns.tolist()
+    #numeric = X_train[feature_names].select_dtypes(include="number").columns.tolist()
+    numeric = [c for c in X_train[feature_names].select_dtypes(include="number").columns if c not in CODE_COLUMNS]
     categorical = [c for c in feature_names if c not in numeric]
 
     numeric_pipe = Pipeline([
@@ -33,8 +36,10 @@ def build_preprocessor(X_train):
         ("scaler", StandardScaler()),
     ])
     categorical_pipe = Pipeline([
-        ("imputer", SimpleImputer(strategy="most_frequent")),
-        ("onehot", OneHotEncoder(handle_unknown="ignore")),
+        #("imputer", SimpleImputer(strategy="most_frequent")),
+        #("onehot", OneHotEncoder(handle_unknown="ignore")),
+        ("imputer", SimpleImputer(strategy="constant", fill_value="Missing")),
+        ("onehot", OneHotEncoder(handle_unknown="infrequent_if_exist", min_frequency=50)),
     ])
     return ColumnTransformer(
         [("numeric", numeric_pipe, numeric),
