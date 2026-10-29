@@ -1,6 +1,6 @@
-"""Evaluate an LLM with GroqCloud; repeatable prompts and JSONL caching.
+"""Evaluate an LLM with OpenRouter; repeatable prompts and JSONL caching.
 
-Set GROQ_API_KEY in your environment. Use --dry-run to preview without calls.
+Set OPENROUTER_API_KEY in your environment. Use --dry-run to preview without calls.
 """
 import argparse
 import hashlib
@@ -70,7 +70,7 @@ def cached_call(client, model, prompt, cache_path, max_retries=3):
     for attempt in range(max_retries):
         try:
             completion = client.chat.completions.create(
-                model=model, temperature=0, max_tokens=24,
+                model=model, temperature=0, max_tokens=2000,
                 messages=[{"role": "user", "content": prompt}])
             response = completion.choices[0].message.content or ""
             with cache_path.open("a") as f:
@@ -99,10 +99,11 @@ def main():
         frame = frame.head(args.limit)
     client = None
     if not args.dry_run:
-        from groq import Groq
-        if not os.getenv("GROQ_API_KEY"):
-            raise RuntimeError("GROQ_API_KEY is not set; use --dry-run to preview")
-        client = Groq()
+        from openai import OpenAI
+        if not os.getenv("OPENROUTER_API_KEY"):
+            raise RuntimeError("OPENROUTER_API_KEY is not set; use --dry-run to preview")
+        client = OpenAI(base_url="https://openrouter.ai/api/v1",
+                        api_key=os.environ["OPENROUTER_API_KEY"])
     output = Path("outputs") / f"llm_{args.format}.csv"
     rows = []
     for i, (_, record) in enumerate(frame.iterrows()):
