@@ -16,7 +16,7 @@ def build_preprocessor(X_train):
     """Return an unfitted preprocessing transformer for diabetes features.
 
     Numeric columns: median imputation. Categorical columns: constant
-    imputation followed by one-hot encoding with unknown categories ignored.
+    imputation followed by one-hot encoding with rare categories going to infrequent column.
     The returned transformer must be fitted ONLY on the training partition.
     """
     from sklearn.compose import ColumnTransformer
@@ -27,7 +27,6 @@ def build_preprocessor(X_train):
     # The caller supplies feature columns, not labels or patient identifiers.
     excluded = {"readmitted", "target", "encounter_id", "patient_nbr", "age_group", "weight"}
     feature_names = [c for c in X_train.columns if c not in excluded]
-    #numeric = X_train[feature_names].select_dtypes(include="number").columns.tolist()
     numeric = [c for c in X_train[feature_names].select_dtypes(include="number").columns if c not in CODE_COLUMNS]
     categorical = [c for c in feature_names if c not in numeric]
 
@@ -36,8 +35,6 @@ def build_preprocessor(X_train):
         ("scaler", StandardScaler()),
     ])
     categorical_pipe = Pipeline([
-        #("imputer", SimpleImputer(strategy="most_frequent")),
-        #("onehot", OneHotEncoder(handle_unknown="ignore")),
         ("imputer", SimpleImputer(strategy="constant", fill_value="Missing")),
         ("onehot", OneHotEncoder(handle_unknown="infrequent_if_exist", min_frequency=50)),
     ])

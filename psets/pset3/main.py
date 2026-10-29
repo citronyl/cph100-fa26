@@ -7,6 +7,7 @@ from evaluation import plot_readmission_rates, compute_auc, auc_confidence_inter
 from models import tune_model
 
 NO_READMIT_CODES = [11, 13, 14, 19, 20, 21]
+
 def run_experiments(frame, seeds, patient_disjoint):
     """Tune each model family on val, eval winner on test, per split."""
     design = "patient" if patient_disjoint else "encounter"
@@ -48,7 +49,6 @@ def main():
     ap.add_argument("--seeds", type=int, nargs="+", default=[42, 43, 44])
     args = ap.parse_args()
     frame = add_age_group(load_data(args.data))
-    #train, val, test = split_data(frame, seed=args.seed, patient_disjoint=args.patient_disjoint)
     cohort = frame[~frame["discharge_disposition_id"].isin(NO_READMIT_CODES)]
     train, val, test = split_data(cohort, seed=args.seed, patient_disjoint=args.patient_disjoint)
     if args.inspect:
@@ -72,7 +72,7 @@ def main():
         results = pd.concat([pd.read_csv(f) for f in files])
         compare_models(results, Path("outputs"))
     if not (args.inspect or args.make_llm_sample or args.explore or args.compare):
-        results = run_experiments(cohorts, args.seeds, args.patient_disjoint)
+        results = run_experiments(cohort, args.seeds, args.patient_disjoint)
         print(results)
 
 
