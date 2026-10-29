@@ -79,7 +79,7 @@ def tune_model(kind, train, val, seed=42):
     }
 
     X_train, y_train = model_features(train)
-    X_val, y_val = model_featureS(val)
+    X_val, y_val = model_features(val)
 
     results = []
     best_auc, best_model, best_params = -1, None, None
