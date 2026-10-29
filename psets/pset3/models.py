@@ -73,9 +73,9 @@ def tune_model(kind, train, val, seed=42):
     and record the search and results. Never select using the test set.
     """
     param_grid = {
-        "linear": {"C": [0.01, 0.1, 1.0, 10.0]},
-        "tree": {"max_depth": [10, None], "min_samples_leaf": [10, 50]},
-        "neural": {"hidden_layer_sizes": [(64,), (64,32)], "alpha": [1e-4, 1e-2]},
+        "linear": {"C": [0.0001, 0.001, 0.003, 0.01, 0.1, 1.0, 10.0]},
+        "tree": {"max_depth": [10, 5, 1, None], "min_samples_leaf": [5, 10, 50]},
+        "neural": {"hidden_layer_sizes": [(64,), (64,32), (128, 64)], "alpha": [1e-5, 1e-4, 1e-2, 1]},
     }
 
     X_train, y_train = model_features(train)
