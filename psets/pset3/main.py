@@ -28,7 +28,7 @@ def run_experiments(frame, seeds, patient_disjoint):
     results.to_csv("outputs/model_results.csv", index=False)
     pd.DataFrame(search_log).to_csv("outputs/tuning_log.csv", index=False)
     return results
-    
+
 def main():
     ap = argparse.ArgumentParser()
     ap.add_argument("--data", default="data/diabetic_data.csv")
@@ -59,7 +59,7 @@ def main():
         output_dir.mkdir(exist_ok=True)
         plot_readmission_rates(frame, output_dir)
     if not args.inspect and not args.make_llm_sample and not args.explore:
-
+        run_experiments(frame, seeds, patient_disjoint)
         print("TODO: Fit and compare three model classes on train/val/test splits.")
         print("See models.py, evaluation.py and README.md.")
 
