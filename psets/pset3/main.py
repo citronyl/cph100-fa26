@@ -1,8 +1,6 @@
 """Starter orchestration; no model results are assumed or supplied."""
 import argparse
 from pathlib import Path
-from data_utils import load_data, add_age_group, split_data, make_llm_sample
-from evaluation import plot_readmission_rates
 import pandas as pd
 from data_utils import load_data, add_age_group, split_data, make_llm_sample, model_features
 from evaluation import plot_readmission_rates, compute_auc, auc_confidence_interval
@@ -10,7 +8,9 @@ from models import tune_model
 
 def run_experiments(frame, seeds, patient_disjoint):
     """Tune each model family on val, eval winner on test, per split."""
+    design = "patient" if patient_disjoint else "encounter"
     rows, search_log = [], []
+
     for seed in seeds:
         train, val, test = split_data(frame, seed=seed, patient_disjoint=patient_disjoint)
         X_test, y_test = model_features(test)
@@ -19,14 +19,19 @@ def run_experiments(frame, seeds, patient_disjoint):
             model, params, search = tune_model(kind, train, val, seed=seed)
             probs = model.predict_proba(X_test)[:,1]
             low, high = auc_confidence_interval(y_test, probs, seed=seed)
-            rows.append({"seed": seed, "kind": kind, "params": str(params),
-                         "test_auc": compute_auc(y_test, probs),
-                         "ci_low": low, "ci_high": high})
+            row = {"design": design, "seed": seed, "kind": kind, "params": str(params),
+                   "test_auc": compute_auc(y_test, probs), "ci_low": low, "ci_high": high}
+            if not patient_disjoint:
+                seen = test["patient_nbr"].isin(train["patient_nbr"]).to_numpy()
+                row["overlap"] = seen.mean()
+                row["auc_seen"] = compute_auc(y_test[seen], probs[seen])
+                row["auc_unseen"] = compute_auc(y_test[~seen], probs[~seen])
+            rows.append(row)
             search_log += [{**r, "seed": seed} for r in search]
-    Path("outputs")/mkdir(exist_ok=True)
+    Path("outputs").mkdir(exist_ok=True)
     results = pd.DataFrame(rows)
-    results.to_csv("outputs/model_results.csv", index=False)
-    pd.DataFrame(search_log).to_csv("outputs/tuning_log.csv", index=False)
+    results.to_csv(f"outputs/model_results_{design}.csv", index=False)
+    pd.DataFrame(search_log).to_csv(f"outputs/tuning_log_{design}.csv", index=False)
     return results
 
 def main():
@@ -59,9 +64,8 @@ def main():
         output_dir.mkdir(exist_ok=True)
         plot_readmission_rates(frame, output_dir)
     if not args.inspect and not args.make_llm_sample and not args.explore:
-        run_experiments(frame, seeds, patient_disjoint)
-        print("TODO: Fit and compare three model classes on train/val/test splits.")
-        print("See models.py, evaluation.py and README.md.")
+        results = run_experiments(frame, args.seeds, args.patient_disjoint)
+        print(results)
 
 
 if __name__ == "__main__":
