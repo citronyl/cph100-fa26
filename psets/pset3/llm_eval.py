@@ -46,7 +46,7 @@ def make_prompt(row: dict, format_name: str) -> str:
     if format_name not in {'structured', 'natural', 'alternative'}:
         raise ValueError('Unknown format')
     if format_name == 'alternative':
-        row, representation = decode_ids(row), 'structured'
+        row, format_name = decode_ids(row), 'structured'
 
     # Never provide the label, derived outcomes, or patient/encounter identifiers.
     fields = []
