@@ -11,17 +11,42 @@ import re
 import time
 import pandas as pd
 from data_utils import EXCLUDE_FROM_FEATURES
+from functools import cache
 
 DEFAULT_MODEL = "openai/gpt-oss-20b"
 PRIVATE_COLUMNS = EXCLUDE_FROM_FEATURES | {"target", "age_group"}
 
+@cache
+def load_id_maps(path='data/IDS_mapping.csv'):
+    """IDS_mapping.csv is several 'xxx_id,description' tables separated by blank lines."""
+    maps, current = {}, None
+    for line in Path(path).read_text(encoding='utf-8-sig').splitlines():
+        key, _, desc = line.partition(',')
+        key = key.strip()
+        if not key:
+            current = None                        # blank line ends a table
+        elif key.endswith('_id'):
+            current = maps.setdefault(key, {})    # header starts a new table
+        elif current is not None and key.isdigit():
+            current[int(key)] = desc.strip().strip('"') or 'not available'
+    return maps
+
+
+def decode_ids(row: dict) -> dict:
+    """Replace each *_id code that has a mapping with its description."""
+    maps = load_id_maps()
+    return {
+        (k.removesuffix('_id') if k in maps else k):
+        (maps[k].get(int(v), f'unmapped code {int(v)}') if k in maps and pd.notna(v) else v)
+        for k, v in row.items()
+    }
 
 def make_prompt(row: dict, format_name: str) -> str:
     """Build two example representations; students design the third."""
     if format_name not in {'structured', 'natural', 'alternative'}:
         raise ValueError('Unknown format')
     if format_name == 'alternative':
-        raise NotImplementedError('Student TODO: design and justify a third prompt format')
+        row, representation = decode_ids(row), 'structured'
 
     # Never provide the label, derived outcomes, or patient/encounter identifiers.
     fields = []
