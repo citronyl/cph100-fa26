@@ -3,7 +3,7 @@ import argparse
 from pathlib import Path
 import pandas as pd
 from data_utils import load_data, add_age_group, split_data, make_llm_sample, model_features
-from evaluation import plot_readmission_rates, compute_auc, auc_confidence_interval
+from evaluation import plot_readmission_rates, compute_auc, auc_confidence_interval, compare_models
 from models import tune_model
 
 def run_experiments(frame, seeds, patient_disjoint):
@@ -43,6 +43,7 @@ def main():
     ap.add_argument("--seed", type=int, default=42)
     ap.add_argument("--patient-disjoint", action="store_true")
     ap.add_argument("--explore", action="store_true")
+    ap.add_argument("--compare", action="store_true")
     ap.add_argument("--seeds", type=int, nargs="+", default=[42, 43, 44])
     args = ap.parse_args()
     frame = add_age_group(load_data(args.data))
@@ -63,7 +64,11 @@ def main():
         output_dir = Path("outputs")
         output_dir.mkdir(exist_ok=True)
         plot_readmission_rates(frame, output_dir)
-    if not args.inspect and not args.make_llm_sample and not args.explore:
+    if args.compare:
+        files = sorted(Path("outputs").glob("model_results_*.csv"))
+        results = pd.concat([pd.read_csv(f) for f in files])
+        compare_models(results, Path("outputs"))
+    if not args.inspect or args.make_llm_sample or args.explore or args.compare:
         results = run_experiments(frame, args.seeds, args.patient_disjoint)
         print(results)
 

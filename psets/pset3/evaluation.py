@@ -68,7 +68,25 @@ def auc_confidence_interval(y_true, probabilities, seed=42, confidence=0.95,
 
 def compare_models(results, output_dir):
     """TODO: Plot model AUCs with confidence intervals and describe variation."""
-    raise NotImplementedError("Student TODO: model comparison plot")
+    kinds = ["linear", "tree", "neural"]
+    fig, axes = plt.subplots(1, 2, figsize=(12, 4.5), sharey=True)
+    for ax, design in zip(axes, ["patient", "encounter"]):
+        sub = results[results["design"] == design]
+        seeds = sorted(sub["seed"].unique())
+        for j, seed in enumerate(seeds):
+            rows = sub[sub["seed"] == seed].set_index("kind").loc[kinds]
+            x = np.arange(len(kinds)) + (j - (len(seeds) -1) / 2) * 0.15
+            yerr = [rows["test_auc"] - rows["ci_low"], rows["ci_high"] - rows["test_auc"]]
+            ax.errorbar(x, rows["test_auc"], yerr=yerr, fmt = "o", capsize = 3, label = f"seed {seed}")
+        ax.set_xticks(range(len(kinds)), kinds)
+        ax.set_title("Patient-disjoint split" if design == "patient" else "Encounter-level split")
+    axes[0].set_ylabel("Test AUC (95% bootstrap CI)")
+    axes[0].legend()
+    fig.tight_layout()
+    fig.savefig(Path(output_dir) / "model_comparison.png", dpi=150)
+    plt.close(fig)
+    print(results.groupby(["design", "kind"])["test_auc"].agg(["mean", "std"]).round(3))
+    #raise NotImplementedError("Student TODO: model comparison plot")
 
 
 def analyze_age_shift(frame, seed=42):
