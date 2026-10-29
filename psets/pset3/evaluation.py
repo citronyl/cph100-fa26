@@ -28,7 +28,8 @@ def plot_readmission_rates(frame, output_dir):
 
 def compute_auc(y_true, probabilities):
     """TODO: Compute ROC AUC from predicted probabilities (not class labels)."""
-    return auc_confidence_interval(y_true, probabilities)
+    from sklearn.metrics import roc_auc_score
+    return roc_auc_score(y_true, probabilities)
 
 
 def auc_confidence_interval(y_true, probabilities, seed=42, confidence=0.95,

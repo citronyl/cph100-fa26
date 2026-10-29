@@ -61,7 +61,7 @@ def build_model(kind, X_train, params=None, seed=42):
     if kind == "neural":
         defaults = {"hidden_layer_sizes": (64,32), "alpha": 1e-3, "max_iter":200}
         classifier = MLPClassifier(random_state=seed, early_stopping=True, **{**defaults, **params})
-    elif kind not in {'linear', 'tree', 'neural'}:
+    if kind not in {'linear', 'tree', 'neural'}:
         raise ValueError(f'Unknown model family: {kind}')
     return Pipeline([("prep", build_preprocessor(X_train)), ("model", classifier)])
 

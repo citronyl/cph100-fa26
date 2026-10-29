@@ -33,7 +33,7 @@ def main():
         output_dir = Path("outputs")
         output_dir.mkdir(exist_ok=True)
         plot_readmission_rates(frame, output_dir)
-    if not args.inspect and not args.make_llm_sample and not args.evaluate:
+    if not args.inspect and not args.make_llm_sample and not args.explore:
         print("TODO: Fit and compare three model classes on train/val/test splits.")
         print("See models.py, evaluation.py and README.md.")
 
