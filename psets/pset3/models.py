@@ -72,7 +72,7 @@ def tune_model(kind, train, val, seed=42):
     TODO: Train candidate models, compute validation AUC, select a candidate,
     and record the search and results. Never select using the test set.
     """
-    PARAMS = {
+    param_grid = {
         "linear": {"C": [0.01, 0.1, 1.0, 10.0]},
         "tree": {"max_depth": [10, None], "min_samples_leaf": [10, 50]},
         "neural": {"hidden_layer_sizes": [(64,), (64,32)], "alpha": [1e-4, 1e-2]},
@@ -83,7 +83,7 @@ def tune_model(kind, train, val, seed=42):
 
     results = []
     best_auc, best_model, best_params = -1, None, None
-    for params in ParameterGrid(PARAMS[kind]):
+    for params in ParameterGrid(param_grid[kind]):
         model = build_model(kind, X_train, params=params, seed=seed)
         model.fit(X_train, y_train)
         auc = compute_auc(y_val, model.predict_proba(X_val)[:,1])
@@ -92,6 +92,3 @@ def tune_model(kind, train, val, seed=42):
         if auc > best_auc:
             best_auc, best_model, best_params = auc, model, params
     return best_model, best_params, results
-
-
-    raise NotImplementedError("Student TODO: hyperparameter search")
