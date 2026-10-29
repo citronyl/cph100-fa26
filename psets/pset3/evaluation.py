@@ -1,10 +1,32 @@
 """Student implementations for Parts 1.1, 1.2, and 1.4."""
-
+import numpy as np
+import matplotlib.pyplot as plt
+from pathlib import Path
 
 def plot_readmission_rates(frame, output_dir):
     """TODO: Plot readmission rates and group sizes by age, gender, race."""
-    raise NotImplementedError("Student TODO: demographic exploration")
+    overall = frame["target"].mean()
+    fig, axes = plt.subplots(1, 3, figsize = (16,5), sharey = True)
 
+    for ax, group in zip(axes, ["age", "gender", "race"]):
+        summary = frame.groupby(group, dropna = False).target.agg(n="size", rate="mean")
+        summary.index = summary.index.fillna("Missing")
+        summary["ci"] = 1.96 * np.sqrt(summary["rate"] * (1-summary["rate"]) / summary["n"])
+        print(summary)
+
+        labels = [f"{name}\n(n={n:,})" for name, n in zip(summary.index, summary["n"])]
+        ax.bar(labels, summary["rate"], yerr = summary["ci"], capsize = 3)
+        ax.axhline(overall, linestyle="--", color = "green", label=f"Overall ({100 * overall:.2f}%)")
+        ax.set_title(f"30-day readmission by {group}")
+        plt.setp(ax.get_xticklabels(), rotation=90, ha="center")
+
+    axes[0].set_ylabel("Readmission rate (<30 days)")
+    axes[0].legend()
+    fig.tight_layout()
+    fig.savefig(Path(output_dir) / "readmission_by_demographics.png", dpi=150)
+    plt.close(fig)
+        
+    #raise NotImplementedError("Student TODO: demographic exploration")
 
 def compute_auc(y_true, probabilities):
     """TODO: Compute ROC AUC from predicted probabilities (not class labels)."""
