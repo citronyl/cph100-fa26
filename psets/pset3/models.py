@@ -6,6 +6,9 @@ from sklearn.pipeline import Pipeline
 from sklearn.linear_model import LogisticRegression
 from sklearn.ensemble import RandomForestClassifier
 from sklearn.neural_network import MLPClassifier
+from sklearn.model_selection import ParameterGrid
+from data_utils import model_features
+from evaluation import compute_auc
 
 def build_preprocessor(X_train):
     """Return an unfitted preprocessing transformer for diabetes features.
@@ -53,14 +56,11 @@ def build_model(kind, X_train, params=None, seed=42):
     """
     params = params or {}
     if kind == "linear":
-        defaults = {"C": 1.0, "max_iter": 2000}
-        classifier = LogisticRegression(random_state=seed, **{**defaults, **params})
+        classifier = LogisticRegression(random_state=seed, max_iter = 2000, **params)
     if kind == "tree":
-        defaults = {"n_estimators": 300, "max_depth": None, "min_samples_leaf":20}
-        classifier = RandomForestClassifier(random_state=seed, n_jobs=-1, **{**defaults, **params})
+        classifier = RandomForestClassifier(random_state=seed, n_jobs=-1, n_estimators = 300, **params)
     if kind == "neural":
-        defaults = {"hidden_layer_sizes": (64,32), "alpha": 1e-3, "max_iter":200}
-        classifier = MLPClassifier(random_state=seed, early_stopping=True, **{**defaults, **params})
+        classifier = MLPClassifier(random_state=seed, early_stopping=True, **params)
     if kind not in {'linear', 'tree', 'neural'}:
         raise ValueError(f'Unknown model family: {kind}')
     return Pipeline([("prep", build_preprocessor(X_train)), ("model", classifier)])
@@ -72,4 +72,26 @@ def tune_model(kind, train, val, seed=42):
     TODO: Train candidate models, compute validation AUC, select a candidate,
     and record the search and results. Never select using the test set.
     """
+    PARAMS = {
+        "linear": {"C": [0.01, 0.1, 1.0, 10.0]},
+        "tree": {"max_depth": [10, None], "min_samples_leaf": [10, 50]},
+        "neural": {"hidden_layer_sizes": [(64,), (64,32)], "alpha": [1e-4, 1e-2]},
+    }
+
+    X_train, y_train = model_features(train)
+    X_val, y_val = model_featureS(val)
+
+    results = []
+    best_auc, best_model, best_params = -1, None, None
+    for params in ParameterGrid(PARAMS[kind]):
+        model = build_model(kind, X_train, params=params, seed=seed)
+        model.fit(X_train, y_train)
+        auc = compute_auc(y_val, model.predict_proba(X_val)[:,1])
+        results.append({"kind": kind, "params": params, "val_auc": auc})
+        print(f"{kind} {params}: val AUC {auc:.3f}")
+        if auc > best_auc:
+            best_auc, best_model, best_params = auc, model, params
+    return best_model, best_params, results
+
+
     raise NotImplementedError("Student TODO: hyperparameter search")
