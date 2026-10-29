@@ -2,7 +2,10 @@
 
 You may use scikit-learn. Do not fit transformations on validation/test data.
 """
-
+from sklearn.pipeline import Pipeline
+from sklearn.linear_model import LogisticRegression
+from sklearn.ensemble import RandomForestClassifier
+from sklearn.neural_network import MLPClassifier
 
 def build_preprocessor(X_train):
     """Return an unfitted preprocessing transformer for diabetes features.
@@ -48,8 +51,18 @@ def build_model(kind, X_train, params=None, seed=42):
       - Expose tunable hyperparameters via params.
       - Set random seeds where supported.
     """
+    if kind == "linear":
+        defaults = {"C": 1.0, "max_iter": 2000}
+        classifier = LogisticRegression(random_state=seed, **{**defaults, **params})
+    if kind == "tree":
+        defaults = {"n_estimators": 300, "max_depth": None, "min_samples_leaf":20}
+        classifier = RandomForestClassifier(random_state=seed, n_jobs=-1, **{**defaults, **params})
+    if kind == "neural":
+        defaults = {"hidden_layer_sizes": (64,32), "alpha": 1e-3, "max_iter":200}
+        classifier = MLPClassifier(random_state=seed, early_stopping=True, **{**defaults, **params})
     if kind not in {'linear', 'tree', 'neural'}:
         raise ValueError(f'Unknown model family: {kind}')
+    return Pipeline([("prep", build_preprocessor(X_train)), ("model", classifier)])
     raise NotImplementedError(f'Student TODO: implement {kind} model')
 
 
