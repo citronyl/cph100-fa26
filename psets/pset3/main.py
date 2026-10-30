@@ -3,7 +3,7 @@ import argparse
 from pathlib import Path
 import pandas as pd
 from data_utils import load_data, add_age_group, split_data, make_llm_sample, model_features
-from evaluation import plot_readmission_rates, compute_auc, auc_confidence_interval, compare_models
+from evaluation import plot_readmission_rates, compute_auc, auc_confidence_interval, compare_models, analyze_age_shift
 from models import tune_model, build_model
 
 NO_READMIT_CODES = [11, 13, 14, 19, 20, 21]
@@ -87,12 +87,14 @@ def main():
             scores[kind] = model.predict_proba(X_sample)[:, 1]
         scores.to_csv("outputs/model_llm_sample.csv", index_label="sample_row")
         for fmt in ["structured", "natural", "alternative"]:
-            scores[fmt] = pd.read_csv(f"outputs/llm_{fmt}.csv")["probabilitiy"]
+            scores[fmt] = pd.read_csv(f"outputs/llm_{fmt}.csv")["probability"]
         for name in ["linear", "tree", "neural", "structured", "natural", "alternative"]:
             valid = scores[name].notna()
             y, p = scores["target"][valid], scores[name][valid]
-            print(name, compute_auc(u, p), auc_confidence_interval(y, p))
-    if not (args.inspect or args.make_llm_sample or args.explore or args.compare or args.score_llm_sample):
+            print(name, compute_auc(y, p), auc_confidence_interval(y, p))
+    if args.shift:
+        analyze_age_shift(cohort, seed=args.seed)
+    if not (args.inspect or args.make_llm_sample or args.explore or args.compare or args.score_llm_sample or args.shift):
         results = run_experiments(cohort, args.seeds, args.patient_disjoint)
         print(results)
 

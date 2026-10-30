@@ -94,13 +94,12 @@ def analyze_age_shift(frame, seed=42):
     on 50-plus patients. Investigate outcome/feature differences and avoid
     using the older group's outcomes in training or model selection.
     """
-    import pandas as pd
     from data_utils import split_data, model_features
     from models import tune_model
 
     train, val, test = split_data(frame, seed=seed, patient_disjoint=True)
-    train_young = train[train["age_group"] == "under 50"]
-    val_young = val[val["age_group"] == "under 50"]
+    train_young = train[train["age_group"] == "under_50"]
+    val_young = val[val["age_group"] == "under_50"]
     model, params, _ = tune_model("linear", train_young, val_young, seed = seed)
     print(params)
     for group in ["under_50", "50_plus"]:
