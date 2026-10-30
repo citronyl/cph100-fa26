@@ -4,7 +4,7 @@ from pathlib import Path
 import pandas as pd
 from data_utils import load_data, add_age_group, split_data, make_llm_sample, model_features
 from evaluation import plot_readmission_rates, compute_auc, auc_confidence_interval, compare_models
-from models import tune_model
+from models import tune_model, build_model
 
 NO_READMIT_CODES = [11, 13, 14, 19, 20, 21]
 
@@ -46,6 +46,7 @@ def main():
     ap.add_argument("--patient-disjoint", action="store_true")
     ap.add_argument("--explore", action="store_true")
     ap.add_argument("--compare", action="store_true")
+    ap.add_argument("--score-llm-sample", action="store_true")
     ap.add_argument("--seeds", type=int, nargs="+", default=[42, 43, 44])
     args = ap.parse_args()
     frame = add_age_group(load_data(args.data))
@@ -71,7 +72,21 @@ def main():
         files = sorted(Path("outputs").glob("model_results_*.csv"))
         results = pd.concat([pd.read_csv(f) for f in files])
         compare_models(results, Path("outputs"))
-    if not (args.inspect or args.make_llm_sample or args.explore or args.compare):
+    if args.score_llm_sample:
+        best_params = {"linear": {"C": 0.01},
+                       "tree": {"max_depth": None, "min_samples_leaf":10},
+                       "neural": {"hidden_layer_sizes": (128, 64), "alpha": 0.01}}
+        sample_ids = pd.read_csv("outputs/llm_sample.csv")["encounter_id"]
+        rows = test.set_index("encounter_id").loc[sample_ids]
+        X_train, y_train = model_features(train)
+        X_sample, y_sample = model_features(rows)
+        scores = rows[["target", "age_group"]].reset_index(drop=True)
+        for kind, params in best_params.items():
+            model = build_model(kind, X_train, params, args.seed).fit(X_train, y_train)
+            scores[kind] = model.predict_proba(X_sample)[:, 1]
+            print(kind, compute_auc(y_sample, scores[kind]))
+        scores.to_csv("outputs/model_llm_sample.csv", index_label="sample_row")
+    if not (args.inspect or args.make_llm_sample or args.explore or args.compare or args.score_llm_sample):
         results = run_experiments(cohort, args.seeds, args.patient_disjoint)
         print(results)
 
