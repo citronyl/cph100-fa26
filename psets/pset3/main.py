@@ -89,9 +89,11 @@ def main():
         for fmt in ["structured", "natural", "alternative"]:
             scores[fmt] = pd.read_csv(f"outputs/llm_{fmt}.csv")["probability"]
         for name in ["linear", "tree", "neural", "structured", "natural", "alternative"]:
-            valid = scores[name].notna()
-            y, p = scores["target"][valid], scores[name][valid]
-            print(name, compute_auc(y, p), auc_confidence_interval(y, p))
+            for group in ["all", "under_50", "50_plus"]:
+                part = scores if group == "all" else scores[scores["age_group"] == group]
+                valid = part[name].notna()
+                y, p = part["target"][valid], part[name][valid]
+                print(name, group, len(y), y.sum(), compute_auc(y, p), auc_confidence_interval(y, p))
     if args.shift:
         analyze_age_shift(cohort, seed=args.seed)
     if not (args.inspect or args.make_llm_sample or args.explore or args.compare or args.score_llm_sample or args.shift):
