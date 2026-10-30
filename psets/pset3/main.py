@@ -47,6 +47,7 @@ def main():
     ap.add_argument("--explore", action="store_true")
     ap.add_argument("--compare", action="store_true")
     ap.add_argument("--score-llm-sample", action="store_true")
+    ap.add_argument("--shift", action="store_true")
     ap.add_argument("--seeds", type=int, nargs="+", default=[42, 43, 44])
     args = ap.parse_args()
     frame = add_age_group(load_data(args.data))
@@ -84,8 +85,13 @@ def main():
         for kind, params in best_params.items():
             model = build_model(kind, X_train, params, args.seed).fit(X_train, y_train)
             scores[kind] = model.predict_proba(X_sample)[:, 1]
-            print(kind, compute_auc(y_sample, scores[kind]))
         scores.to_csv("outputs/model_llm_sample.csv", index_label="sample_row")
+        for fmt in ["structured", "natural", "alternative"]:
+            scores[fmt] = pd.read_csv(f"outputs/llm_{fmt}.csv")["probabilitiy"]
+        for name in ["linear", "tree", "neural", "structured", "natural", "alternative"]:
+            valid = scores[name].notna()
+            y, p = scores["target"][valid], scores[name][valid]
+            print(name, compute_auc(u, p), auc_confidence_interval(y, p))
     if not (args.inspect or args.make_llm_sample or args.explore or args.compare or args.score_llm_sample):
         results = run_experiments(cohort, args.seeds, args.patient_disjoint)
         print(results)
