@@ -6,3 +6,5 @@ matplotlib>=3.7,<4
 scipy>=1.11,<2
 mne>=1.12.1,<2
 braindecode>=1.2.0,<2s
+ipykernel
+nbstripout
