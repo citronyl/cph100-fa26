@@ -32,7 +32,7 @@ Runs were done on a Google Cloud Compute Engine VM:
 python3 -m venv ~/envs/cph100 --system-site-packages
 source ~/envs/cph100/bin/activate
 pip install -r requirements.txt
-python check_requirements.py
+python check_installation.py
 ```
 
 PyTorch is not in `requirements.txt`. It comes from the GPU image (2.9.1+cu129).
